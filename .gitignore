@@ -40,5 +40,9 @@ fonts/*.ttf
 fonts/*.otf
 !fonts/.gitkeep
 
+node_modules/
+.tmp_props.json
+remotion/out/
+
 .DS_Store
 Thumbs.db

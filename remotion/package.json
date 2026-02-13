@@ -1,0 +1,33 @@
+{
+  "name": "videoforge-remotion",
+  "version": "0.1.0",
+  "description": "Remotion video rendering engine for VideoForge",
+  "private": true,
+  "scripts": {
+    "dev": "npx remotion studio",
+    "start": "npx remotion studio",
+    "build": "npx remotion render",
+    "render": "npx remotion render VideoForgeComposition",
+    "render:youtube": "npx remotion render YouTubeIntro",
+    "render:tiktok": "npx remotion render TikTokShort",
+    "render:explainer": "npx remotion render TextExplainer",
+    "render:presentation": "npx remotion render Presentation",
+    "upgrade": "npx remotion upgrade"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0",
+    "@remotion/player": "^4.0",
+    "@remotion/tailwind": "^4.0",
+    "react": "^18.3",
+    "react-dom": "^18.3",
+    "remotion": "^4.0",
+    "tailwindcss": "^4.0",
+    "zod": "^3.23"
+  },
+  "devDependencies": {
+    "@remotion/eslint-config": "^4.0",
+    "@types/react": "^18.3",
+    "typescript": "^5.5",
+    "@remotion/compositor-win32-x64-msvc": "^4.0"
+  }
+}

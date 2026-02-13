@@ -1,6 +1,7 @@
 # 動画作成 (Video Create)
 
 自然言語の指示から動画を自動生成します。
+**2つのエンジン対応**: FFmpeg（シンプル・高速）と Remotion（リッチなアニメーション）。
 
 ## 使い方
 
@@ -22,100 +23,170 @@
 - **ナレーションの有無**
 - **使用したい素材** (画像・動画のパス)
 - **テンプレート指定** (例: "イントロ", "プレゼン")
+- **エンジン指定**: "リッチ" "アニメーション" "Remotion" → Remotion、それ以外 → FFmpeg
 
-### Step 2: VideoSpec YAML を生成
+### Step 2: エンジン選択
 
-上記の解析結果をもとに、VideoForge の VideoSpec YAML を生成してください。
+**Remotion を使う場合** (アニメーション重視、リッチなエフェクト):
 
-YAML のフォーマット:
+1. `C:\Users\ThinkPad\Desktop\videoforge\remotion\` ディレクトリで作業
+2. Remotion Studio を使ったライブプレビュー可能
+3. React コンポーネントとして動画を作成
+4. `npx remotion render` でMP4出力
+
+**FFmpeg を使う場合** (シンプル、高速):
+
+1. VideoSpec YAML を生成
+2. `videoforge render` で実行
+
+### Step 3A: Remotion で作成する場合
+
+#### 方法1: 直接Reactコンポーネントを書く（最も柔軟）
+
+Remotion プロジェクト内で新しいコンポーネントを作成してください:
+
+```
+C:\Users\ThinkPad\Desktop\videoforge\remotion\src\
+```
+
+**基本構造:**
+```tsx
+import { AbsoluteFill, Sequence, useCurrentFrame, useVideoConfig, interpolate, spring } from "remotion";
+
+export const MyVideo: React.FC<{ title: string }> = ({ title }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  const opacity = interpolate(frame, [0, fps * 0.5], [0, 1], {
+    extrapolateRight: "clamp",
+  });
+
+  return (
+    <AbsoluteFill style={{ backgroundColor: "#1a1a2e" }}>
+      <div style={{
+        opacity,
+        fontSize: 72,
+        fontFamily: "Yu Gothic, sans-serif",
+        color: "#FFFFFF",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100%",
+      }}>
+        {title}
+      </div>
+    </AbsoluteFill>
+  );
+};
+```
+
+Remotion の主要API:
+- `useCurrentFrame()` - 現在のフレーム番号
+- `useVideoConfig()` - fps, width, height, durationInFrames
+- `interpolate(frame, inputRange, outputRange)` - アニメーション補間
+- `spring({ frame, fps })` - バネアニメーション
+- `<Sequence from={frame} durationInFrames={n}>` - タイムライン配置
+- `<AbsoluteFill>` - フルスクリーンレイヤー
+- `<Img src={...}>` - 画像表示
+- `<Video src={...}>` - 動画埋め込み
+
+Root.tsx に Composition を登録してからレンダリング:
+
+```bash
+cd C:\Users\ThinkPad\Desktop\videoforge\remotion
+npx remotion render MyCompositionId output.mp4 --props props.json
+```
+
+#### 方法2: 既存テンプレートを使う
+
+利用可能なRemotion Composition:
+- `YouTubeIntro` - props: `{ title, subtitle?, accentColor? }`
+- `TikTokShort` - props: `{ title, points: string[], accentColor? }`
+- `TextExplainer` - props: `{ title, sections: [{ heading, body }] }`
+- `Presentation` - props: `{ title, slides: [{ heading, body }], theme?: "dark"|"light" }`
+- `VideoForgeComposition` - VideoSpec 形式のprops（汎用）
+
+```bash
+cd C:\Users\ThinkPad\Desktop\videoforge\remotion
+npx remotion render YouTubeIntro output.mp4 --props '{"title":"AI入門","subtitle":"Episode 1"}'
+```
+
+#### 方法3: VideoSpec YAML → Remotion
+
+```bash
+cd C:\Users\ThinkPad\Desktop\videoforge
+python -m videoforge.cli render spec.yaml --engine remotion -o output.mp4
+```
+
+### Step 3B: FFmpeg で作成する場合
+
+VideoSpec YAML を生成して保存:
 
 ```yaml
 version: "1.0"
 video:
   title: "タイトル"
-  resolution: [1920, 1080]  # YouTube=16:9, TikTok/Reels=[1080, 1920]
+  resolution: [1920, 1080]
   fps: 30
 
 scenes:
   - id: scene_名前
-    type: color          # color / image / video
+    type: color
     duration: 秒数
-    color: "#hex色"      # type=colorの場合
-    source: "パス"       # type=image/videoの場合
+    color: "#hex色"
     text_overlays:
       - content: "テキスト"
-        position: center   # center / top_center / bottom_center / top_left / bottom_left / top_right / bottom_right
+        position: center
         font: "Yu Gothic"
         font_size: 48
         color: "#FFFFFF"
-        bg_color: "#00000088"  # 半透明背景 (オプション)
-        start: 0.5        # 表示開始秒 (オプション)
-        end: 4.5           # 表示終了秒 (オプション)
-    transition_out: fade   # none / fade / crossfade / wipe_left / dissolve
+    transition_out: fade
     transition_duration: 0.5
 
 audio:
   bgm:
-    source: "BGMファイルパス"  # ローカルファイルがある場合
+    source: "BGMファイルパス"
     volume: 0.3
-    fade_in: 1.0
-    fade_out: 2.0
-  narration:
-    - scene: scene_id
-      text: "ナレーションテキスト"
-      voice: voicevox
-      speaker_id: 1
 
 export:
-  platform: youtube    # youtube / tiktok / instagram
+  platform: youtube
   codec: h264
 ```
 
-### Step 3: YAML ファイルを保存
+保存先: `C:\Users\ThinkPad\Desktop\videoforge\output\{タイトル}_spec.yaml`
 
-生成した YAML を VideoForge プロジェクトディレクトリ内に保存してください:
-
-```
-C:\Users\ThinkPad\Desktop\videoforge\output\{タイトル}_spec.yaml
-```
-
-### Step 4: レンダリング実行
-
-以下のコマンドでレンダリングを実行してください:
-
+レンダリング:
 ```bash
 cd C:\Users\ThinkPad\Desktop\videoforge
 python -m videoforge.cli render output/{タイトル}_spec.yaml -o output/{タイトル}.mp4
 ```
 
-### Step 5: 結果を報告
+### Step 4: 結果を報告
 
-レンダリング結果をユーザーに報告:
 - 出力ファイルパス
 - 動画の長さ
 - 解像度
-- 含まれるシーン数
+- 使用エンジン（FFmpeg or Remotion）
 
-## テンプレート一覧
-
-利用可能なテンプレート:
-- `youtube_intro` - YouTubeイントロ (7秒)
-- `youtube_outro` - YouTubeアウトロ (10秒)
-- `tiktok_short` - TikTokショート動画 (15秒)
-- `presentation` - プレゼンテーション
-- `photo_montage` - フォトモンタージュ
-- `text_explainer` - テキスト解説動画
-
-テンプレートを使う場合:
+## Remotion Studio でライブプレビュー
 
 ```bash
-cd C:\Users\ThinkPad\Desktop\videoforge
-python -m videoforge.cli template use テンプレート名 --title "タイトル" -o output/出力.mp4
+cd C:\Users\ThinkPad\Desktop\videoforge\remotion
+npm run dev
+# ブラウザで http://localhost:3000 を開く
+```
+
+## セットアップ（初回のみ）
+
+```bash
+cd C:\Users\ThinkPad\Desktop\videoforge\remotion
+npm install
 ```
 
 ## 注意事項
 
-- BGMファイルがない場合は `audio.bgm` セクションを省略
-- VOICEVOX が起動していない場合はナレーションをスキップ
-- 画像を使う場合は絶対パスまたは VideoSpec からの相対パスで指定
+- Remotion はリッチなアニメーション・エフェクトに強い（CSS、React の全機能が使える）
+- FFmpeg はシンプルなスライドショーやテロップ付き動画に向く
 - 日本語フォントは "Yu Gothic" をデフォルトで使用
+- BGMファイルがない場合は audio セクションを省略
+- VOICEVOX が起動していない場合はナレーションをスキップ
