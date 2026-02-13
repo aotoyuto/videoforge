@@ -1,0 +1,92 @@
+version: "1.0"
+video:
+  title: "{{title}}"
+  resolution: [1920, 1080]
+  fps: 30
+  background_color: "#0d1117"
+
+scenes:
+  - id: intro
+    type: color
+    duration: 3.0
+    color: "#0d1117"
+    text_overlays:
+      - content: "{{title}}"
+        position: center
+        font: "Yu Gothic"
+        font_size: 64
+        color: "#58a6ff"
+    transition_out: fade
+    transition_duration: 0.5
+
+  - id: point_1
+    type: color
+    duration: 6.0
+    color: "#0d1117"
+    text_overlays:
+      - content: "ポイント 1"
+        position: top_center
+        font: "Yu Gothic"
+        font_size: 48
+        color: "#58a6ff"
+      - content: "ここに説明文を入れてください。\n詳しい解説をここに書きます。"
+        position: center
+        font: "Yu Gothic"
+        font_size: 32
+        color: "#c9d1d9"
+    transition_out: fade
+    transition_duration: 0.5
+
+  - id: point_2
+    type: color
+    duration: 6.0
+    color: "#0d1117"
+    text_overlays:
+      - content: "ポイント 2"
+        position: top_center
+        font: "Yu Gothic"
+        font_size: 48
+        color: "#58a6ff"
+      - content: "二つ目の解説ポイント。\nここに詳細を記述します。"
+        position: center
+        font: "Yu Gothic"
+        font_size: 32
+        color: "#c9d1d9"
+    transition_out: fade
+    transition_duration: 0.5
+
+  - id: summary
+    type: color
+    duration: 4.0
+    color: "#161b22"
+    text_overlays:
+      - content: "まとめ"
+        position: center
+        font: "Yu Gothic"
+        font_size: 56
+        color: "#FFFFFF"
+
+audio:
+  bgm:
+    volume: 0.15
+    fade_in: 1.0
+    fade_out: 2.0
+
+  narration:
+    - scene: intro
+      text: "今回のテーマについて解説します。"
+      voice: voicevox
+      speaker_id: 1
+    - scene: point_1
+      text: "まず一つ目のポイントについてお話しします。"
+      voice: voicevox
+      speaker_id: 1
+    - scene: point_2
+      text: "続いて二つ目のポイントです。"
+      voice: voicevox
+      speaker_id: 1
+
+export:
+  platform: youtube
+  codec: h264
+  quality: high

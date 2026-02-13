@@ -1,0 +1,46 @@
+version: "1.0"
+video:
+  title: "エンディング"
+  resolution: [1920, 1080]
+  fps: 30
+  background_color: "#000000"
+
+scenes:
+  - id: outro_main
+    type: color
+    duration: 8.0
+    color: "#1a1a2e"
+    text_overlays:
+      - content: "ご視聴ありがとうございました"
+        position: center
+        font: "Yu Gothic"
+        font_size: 56
+        color: "#FFFFFF"
+        animation: fade_in
+        start: 0.5
+        end: 7.0
+      - content: "チャンネル登録・高評価お願いします！"
+        position: bottom_center
+        font: "Yu Gothic"
+        font_size: 32
+        color: "#ff6b6b"
+        start: 2.0
+        end: 7.0
+    transition_out: fade
+    transition_duration: 1.5
+
+  - id: black_end
+    type: color
+    duration: 1.5
+    color: "#000000"
+
+audio:
+  bgm:
+    volume: 0.25
+    fade_in: 0.5
+    fade_out: 1.5
+
+export:
+  platform: youtube
+  codec: h264
+  quality: high

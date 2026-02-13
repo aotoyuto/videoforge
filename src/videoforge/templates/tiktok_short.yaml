@@ -1,0 +1,54 @@
+version: "1.0"
+video:
+  title: "{{title}}"
+  resolution: [1080, 1920]
+  fps: 30
+  background_color: "#000000"
+
+scenes:
+  - id: hook
+    type: color
+    duration: 3.0
+    color: "#ff6b6b"
+    text_overlays:
+      - content: "{{title}}"
+        position: center
+        font: "Yu Gothic"
+        font_size: 80
+        color: "#FFFFFF"
+        animation: fade_in
+    transition_out: fade
+    transition_duration: 0.3
+
+  - id: main_content
+    type: color
+    duration: 10.0
+    color: "#1a1a2e"
+    text_overlays:
+      - content: "ここにメインコンテンツ"
+        position: center
+        font: "Yu Gothic"
+        font_size: 56
+        color: "#FFFFFF"
+
+  - id: cta
+    type: color
+    duration: 2.0
+    color: "#ff6b6b"
+    text_overlays:
+      - content: "フォローしてね！"
+        position: center
+        font: "Yu Gothic"
+        font_size: 64
+        color: "#FFFFFF"
+
+audio:
+  bgm:
+    volume: 0.4
+    fade_in: 0.3
+    fade_out: 0.5
+
+export:
+  platform: tiktok
+  codec: h264
+  quality: high

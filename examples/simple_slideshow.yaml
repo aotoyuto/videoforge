@@ -1,0 +1,73 @@
+version: "1.0"
+video:
+  title: "サンプルスライドショー"
+  resolution: [1920, 1080]
+  fps: 30
+  background_color: "#000000"
+
+scenes:
+  - id: title
+    type: color
+    duration: 4.0
+    color: "#2c3e50"
+    text_overlays:
+      - content: "VideoForge サンプル動画"
+        position: center
+        font: "Yu Gothic"
+        font_size: 64
+        color: "#FFFFFF"
+    transition_out: fade
+    transition_duration: 0.5
+
+  - id: slide_1
+    type: color
+    duration: 5.0
+    color: "#3498db"
+    text_overlays:
+      - content: "スライド 1"
+        position: top_center
+        font: "Yu Gothic"
+        font_size: 48
+        color: "#FFFFFF"
+      - content: "自然言語から動画を自動生成します"
+        position: center
+        font: "Yu Gothic"
+        font_size: 36
+        color: "#ecf0f1"
+    transition_out: crossfade
+    transition_duration: 0.5
+
+  - id: slide_2
+    type: color
+    duration: 5.0
+    color: "#e74c3c"
+    text_overlays:
+      - content: "スライド 2"
+        position: top_center
+        font: "Yu Gothic"
+        font_size: 48
+        color: "#FFFFFF"
+      - content: "テロップ・BGM・ナレーションに対応"
+        position: center
+        font: "Yu Gothic"
+        font_size: 36
+        color: "#ecf0f1"
+    transition_out: crossfade
+    transition_duration: 0.5
+
+  - id: ending
+    type: color
+    duration: 3.0
+    color: "#2c3e50"
+    text_overlays:
+      - content: "ご視聴ありがとうございました"
+        position: center
+        font: "Yu Gothic"
+        font_size: 48
+        color: "#FFFFFF"
+
+export:
+  format: mp4
+  codec: h264
+  platform: youtube
+  quality: high

@@ -1,0 +1,53 @@
+version: "1.0"
+video:
+  title: "AI入門講座"
+  resolution: [1920, 1080]
+  fps: 30
+
+scenes:
+  - id: pre_intro
+    type: color
+    duration: 1.5
+    color: "#0a0a1a"
+    transition_out: fade
+    transition_duration: 0.5
+
+  - id: main_title
+    type: color
+    duration: 5.0
+    color: "#1a1a2e"
+    text_overlays:
+      - content: "AI入門講座"
+        position: center
+        font: "Yu Gothic"
+        font_size: 80
+        color: "#FFFFFF"
+        animation: fade_in
+        start: 0.5
+        end: 4.5
+      - content: "Episode 1: AIとは何か？"
+        position: bottom_center
+        font: "Yu Gothic"
+        font_size: 32
+        color: "#888888"
+        start: 1.5
+        end: 4.5
+    transition_out: fade
+    transition_duration: 1.0
+
+  - id: fade_out
+    type: color
+    duration: 1.0
+    color: "#000000"
+
+audio:
+  narration:
+    - scene: main_title
+      text: "皆さん、こんにちは。AI入門講座へようこそ。"
+      voice: voicevox
+      speaker_id: 1
+
+export:
+  format: mp4
+  codec: h264
+  platform: youtube

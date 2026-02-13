@@ -1,0 +1,65 @@
+version: "1.0"
+video:
+  title: "{{title}}"
+  resolution: [1920, 1080]
+  fps: 30
+  background_color: "#FFFFFF"
+
+scenes:
+  - id: title_slide
+    type: color
+    duration: 5.0
+    color: "#2c3e50"
+    text_overlays:
+      - content: "{{title}}"
+        position: center
+        font: "Yu Gothic"
+        font_size: 64
+        color: "#FFFFFF"
+      - content: "プレゼンテーション"
+        position: bottom_center
+        font: "Yu Gothic"
+        font_size: 28
+        color: "#bdc3c7"
+    transition_out: crossfade
+    transition_duration: 0.5
+
+  - id: slide_1
+    type: color
+    duration: 8.0
+    color: "#ecf0f1"
+    text_overlays:
+      - content: "第1章"
+        position: top_center
+        font: "Yu Gothic"
+        font_size: 48
+        color: "#2c3e50"
+      - content: "ここに説明テキストを入れてください"
+        position: center
+        font: "Yu Gothic"
+        font_size: 32
+        color: "#34495e"
+    transition_out: crossfade
+    transition_duration: 0.5
+
+  - id: ending_slide
+    type: color
+    duration: 4.0
+    color: "#2c3e50"
+    text_overlays:
+      - content: "ありがとうございました"
+        position: center
+        font: "Yu Gothic"
+        font_size: 56
+        color: "#FFFFFF"
+
+audio:
+  bgm:
+    volume: 0.15
+    fade_in: 1.0
+    fade_out: 2.0
+
+export:
+  platform: youtube
+  codec: h264
+  quality: high

@@ -1,0 +1,91 @@
+version: "1.0"
+video:
+  title: "ChatGPTの使い方"
+  resolution: [1920, 1080]
+  fps: 30
+
+scenes:
+  - id: intro
+    type: color
+    duration: 4.0
+    color: "#0d1117"
+    text_overlays:
+      - content: "ChatGPTの使い方"
+        position: center
+        font: "Yu Gothic"
+        font_size: 64
+        color: "#58a6ff"
+    transition_out: fade
+    transition_duration: 0.5
+
+  - id: what_is
+    type: color
+    duration: 8.0
+    color: "#0d1117"
+    text_overlays:
+      - content: "ChatGPTとは？"
+        position: top_center
+        font: "Yu Gothic"
+        font_size: 48
+        color: "#58a6ff"
+      - content: "OpenAIが開発した大規模言語モデル。\n自然な会話でタスクをサポートします。"
+        position: center
+        font: "Yu Gothic"
+        font_size: 32
+        color: "#c9d1d9"
+    transition_out: crossfade
+    transition_duration: 0.5
+
+  - id: how_to
+    type: color
+    duration: 8.0
+    color: "#161b22"
+    text_overlays:
+      - content: "使い方のコツ"
+        position: top_center
+        font: "Yu Gothic"
+        font_size: 48
+        color: "#58a6ff"
+      - content: "1. 具体的に質問する\n2. 文脈を伝える\n3. 出力形式を指定する"
+        position: center
+        font: "Yu Gothic"
+        font_size: 36
+        color: "#c9d1d9"
+    transition_out: crossfade
+    transition_duration: 0.5
+
+  - id: outro
+    type: color
+    duration: 4.0
+    color: "#0d1117"
+    text_overlays:
+      - content: "まとめ"
+        position: center
+        font: "Yu Gothic"
+        font_size: 56
+        color: "#FFFFFF"
+
+audio:
+  narration:
+    - scene: intro
+      text: "今回はChatGPTの使い方について解説します。"
+      voice: voicevox
+      speaker_id: 1
+    - scene: what_is
+      text: "ChatGPTとは、OpenAIが開発した大規模言語モデルです。自然な会話を通じて、様々なタスクをサポートしてくれます。"
+      voice: voicevox
+      speaker_id: 1
+    - scene: how_to
+      text: "効果的に使うコツは3つあります。まず、具体的に質問すること。次に、文脈をしっかり伝えること。最後に、出力形式を指定することです。"
+      voice: voicevox
+      speaker_id: 1
+    - scene: outro
+      text: "以上がChatGPTの基本的な使い方です。ぜひ試してみてください。"
+      voice: voicevox
+      speaker_id: 1
+
+export:
+  format: mp4
+  codec: h264
+  platform: youtube
+  quality: high

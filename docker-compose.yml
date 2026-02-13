@@ -1,0 +1,18 @@
+services:
+  videoforge:
+    build: .
+    volumes:
+      - ./output:/app/output
+      - ./examples:/app/examples
+      - ./fonts:/app/fonts
+    environment:
+      - VOICEVOX_URL=http://voicevox:50021
+      - OUTPUT_DIR=/app/output
+      - DEFAULT_FONT=Noto Sans CJK JP
+    depends_on:
+      - voicevox
+
+  voicevox:
+    image: voicevox/voicevox_engine:latest
+    ports:
+      - "50021:50021"

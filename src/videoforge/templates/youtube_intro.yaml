@@ -1,0 +1,54 @@
+version: "1.0"
+video:
+  title: "{{title}}"
+  resolution: [1920, 1080]
+  fps: 30
+  background_color: "#000000"
+
+scenes:
+  - id: bg_intro
+    type: color
+    duration: 2.0
+    color: "#0a0a1a"
+    text_overlays: []
+    transition_out: fade
+    transition_duration: 0.5
+
+  - id: title_card
+    type: color
+    duration: 4.0
+    color: "#1a1a2e"
+    text_overlays:
+      - content: "{{title}}"
+        position: center
+        font: "Yu Gothic"
+        font_size: 72
+        color: "#FFFFFF"
+        animation: fade_in
+        start: 0.5
+        end: 3.5
+      - content: "presented by VideoForge"
+        position: bottom_center
+        font: "Yu Gothic"
+        font_size: 24
+        color: "#888888"
+        start: 1.5
+        end: 3.5
+    transition_out: fade
+    transition_duration: 0.8
+
+  - id: transition_out
+    type: color
+    duration: 1.0
+    color: "#000000"
+
+audio:
+  bgm:
+    volume: 0.2
+    fade_in: 0.5
+    fade_out: 1.0
+
+export:
+  platform: youtube
+  codec: h264
+  quality: high

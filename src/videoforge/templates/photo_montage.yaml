@@ -1,0 +1,72 @@
+version: "1.0"
+video:
+  title: "{{title}}"
+  resolution: [1920, 1080]
+  fps: 30
+  background_color: "#000000"
+
+scenes:
+  - id: photo_1
+    type: image
+    duration: 4.0
+    fit: cover
+    text_overlays:
+      - content: "写真1のキャプション"
+        position: bottom_center
+        font: "Yu Gothic"
+        font_size: 36
+        color: "#FFFFFF"
+        bg_color: "#00000088"
+    transition_out: crossfade
+    transition_duration: 1.0
+
+  - id: photo_2
+    type: image
+    duration: 4.0
+    fit: cover
+    text_overlays:
+      - content: "写真2のキャプション"
+        position: bottom_center
+        font: "Yu Gothic"
+        font_size: 36
+        color: "#FFFFFF"
+        bg_color: "#00000088"
+    transition_out: crossfade
+    transition_duration: 1.0
+
+  - id: photo_3
+    type: image
+    duration: 4.0
+    fit: cover
+    text_overlays:
+      - content: "写真3のキャプション"
+        position: bottom_center
+        font: "Yu Gothic"
+        font_size: 36
+        color: "#FFFFFF"
+        bg_color: "#00000088"
+    transition_out: fade
+    transition_duration: 1.0
+
+  - id: ending
+    type: color
+    duration: 3.0
+    color: "#000000"
+    text_overlays:
+      - content: "{{title}}"
+        position: center
+        font: "Yu Gothic"
+        font_size: 48
+        color: "#FFFFFF"
+
+audio:
+  bgm:
+    volume: 0.3
+    fade_in: 1.0
+    fade_out: 2.0
+    loop: true
+
+export:
+  platform: youtube
+  codec: h264
+  quality: high
