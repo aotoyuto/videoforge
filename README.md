@@ -65,6 +65,8 @@ Claude Code 内で Remotion プロジェクト (`remotion/`) を直接編集し�
 - VOICEVOX (日本語TTS) - `http://localhost:50021`
 - Docker (コンテナ実行)
 
+> **詳細なセットアップ手順は [docs/SETUP.md](docs/SETUP.md) を参照してください。**
+
 ## Remotion テンプレート
 
 | Composition | 用途 | Props |
