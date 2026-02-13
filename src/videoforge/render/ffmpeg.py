@@ -133,7 +133,13 @@ def add_text_overlay(
     end: float | None = None,
     font_path: str | None = None,
 ) -> Path:
-    """Add a text overlay to a video using FFmpeg drawtext filter."""
+    """Add a text overlay to a video using FFmpeg drawtext filter.
+
+    Uses textfile= with a temporary UTF-8 file for reliable Japanese text rendering
+    on Windows, where passing Unicode directly via command line can cause mojibake.
+    """
+    import tempfile
+
     # Position mapping
     pos_map = {
         "center": "x=(w-text_w)/2:y=(h-text_h)/2",
@@ -146,57 +152,108 @@ def add_text_overlay(
     }
     pos_expr = pos_map.get(position, pos_map["bottom_center"])
 
-    # Escape text for FFmpeg (colon, backslash, single quote)
-    escaped_text = text.replace("\\", "\\\\").replace("'", "'\\''").replace(":", "\\:")
+    # Write text to a temp file (UTF-8 with BOM for FFmpeg on Windows)
+    text_file = output.parent / f"_text_{output.stem}.txt"
+    text_file.write_text(text, encoding="utf-8-sig")
 
-    # Build drawtext filter
-    parts = [f"text='{escaped_text}'"]
+    try:
+        # Use just the filename and set cwd to avoid Windows path colon issues
+        text_filename = text_file.name
+        work_dir = text_file.parent
 
-    if font_path:
-        parts.append(f"fontfile='{font_path}'")
-    else:
-        parts.append(f"font='{font}'")
+        # Build drawtext filter - use font= (name) to avoid fontfile path colon issues
+        parts = [f"textfile={text_filename}"]
+        parts.append(f"font={font}")
 
-    parts.append(f"fontsize={font_size}")
+        parts.append(f"fontsize={font_size}")
 
-    # Convert hex color to FFmpeg format
-    hex_c = color.lstrip("#")
-    parts.append(f"fontcolor=0x{hex_c}")
+        # Convert hex color to FFmpeg format
+        hex_c = color.lstrip("#")
+        parts.append(f"fontcolor=0x{hex_c}")
 
-    parts.append(pos_expr)
+        parts.append(pos_expr)
 
-    if bg_color:
-        hex_bg = bg_color.lstrip("#")
-        if len(hex_bg) == 8:
-            parts.append(f"box=1:boxcolor=0x{hex_bg[:6]}@0x{hex_bg[6:]}:boxborderw=10")
-        else:
-            parts.append(f"box=1:boxcolor=0x{hex_bg}@0.5:boxborderw=10")
+        if bg_color:
+            hex_bg = bg_color.lstrip("#")
+            if len(hex_bg) == 8:
+                alpha = int(hex_bg[6:], 16) / 255
+                parts.append(f"box=1:boxcolor=0x{hex_bg[:6]}@{alpha:.2f}:boxborderw=10")
+            else:
+                parts.append(f"box=1:boxcolor=0x{hex_bg}@0.5:boxborderw=10")
 
-    if border_color and border_width > 0:
-        hex_border = border_color.lstrip("#")
-        parts.append(f"bordercolor=0x{hex_border}:borderw={border_width}")
+        if border_color and border_width > 0:
+            hex_border = border_color.lstrip("#")
+            parts.append(f"bordercolor=0x{hex_border}:borderw={border_width}")
 
-    # Enable/disable timing
-    if start is not None or end is not None:
-        enable_parts = []
-        if start is not None:
-            enable_parts.append(f"gte(t,{start})")
-        if end is not None:
-            enable_parts.append(f"lte(t,{end})")
-        enable_expr = "*".join(enable_parts)
-        parts.append(f"enable='{enable_expr}'")
+        # Enable/disable timing
+        if start is not None or end is not None:
+            enable_parts = []
+            if start is not None:
+                enable_parts.append(f"gte(t\\,{start})")
+            if end is not None:
+                enable_parts.append(f"lte(t\\,{end})")
+            enable_expr = "*".join(enable_parts)
+            parts.append(f"enable={enable_expr}")
 
-    drawtext = "drawtext=" + ":".join(parts)
+        drawtext = "drawtext=" + ":".join(parts)
 
-    run_ffmpeg([
-        "-i", str(input_video),
-        "-vf", drawtext,
-        "-c:v", "libx264",
-        "-pix_fmt", "yuv420p",
-        "-c:a", "copy",
-        str(output),
-    ])
+        run_ffmpeg([
+            "-i", str(input_video.resolve()),
+            "-vf", drawtext,
+            "-c:v", "libx264",
+            "-pix_fmt", "yuv420p",
+            "-c:a", "copy",
+            str(output.resolve()),
+        ], cwd=work_dir)
+    finally:
+        text_file.unlink(missing_ok=True)
+
     return output
+
+
+def _escape_ffmpeg_path(p: Path) -> str:
+    """Escape a file path for use inside FFmpeg filter expressions.
+
+    FFmpeg filter syntax uses : and \\ as special characters.
+    Paths must have colons and backslashes escaped, and use forward slashes.
+    """
+    s = str(p.resolve()).replace("\\", "/")
+    # Escape special characters for FFmpeg drawtext filter
+    s = s.replace(":", "\\:")
+    s = s.replace("'", "\\'")
+    return s
+
+
+# Common Japanese font paths on Windows
+_WINDOWS_FONT_CANDIDATES = [
+    ("Yu Gothic", "C:/Windows/Fonts/YuGothM.ttc"),
+    ("Yu Gothic", "C:/Windows/Fonts/yugothic.ttf"),
+    ("Meiryo", "C:/Windows/Fonts/meiryo.ttc"),
+    ("MS Gothic", "C:/Windows/Fonts/msgothic.ttc"),
+    ("Noto Sans CJK JP", "C:/Windows/Fonts/NotoSansCJKjp-Regular.otf"),
+    ("Noto Sans JP", "C:/Windows/Fonts/NotoSansJP-Regular.otf"),
+]
+
+
+def _resolve_font_path(font_name: str, explicit_path: str | None = None) -> str | None:
+    """Resolve a font name to an actual file path on the system."""
+    if explicit_path:
+        if Path(explicit_path).exists():
+            return explicit_path
+
+    # Try known Windows font paths
+    for name, path in _WINDOWS_FONT_CANDIDATES:
+        if font_name.lower() in name.lower() and Path(path).exists():
+            return path
+
+    # Fallback: try generic Windows font directory search
+    fonts_dir = Path("C:/Windows/Fonts")
+    if fonts_dir.exists():
+        for candidate in fonts_dir.iterdir():
+            if font_name.lower().replace(" ", "") in candidate.stem.lower():
+                return str(candidate)
+
+    return None
 
 
 def concat_videos(output: Path, video_files: list[Path]) -> Path:
